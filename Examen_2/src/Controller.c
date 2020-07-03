@@ -12,38 +12,75 @@
 int controller_loadFromText(LinkedList* pArrayList)
 {
 	FILE* txt;
-	char path[512];
-
-	int result;
-
-
-	fflush(stdin);
-	printf("\nIngrese el nombre del archivo\n");
-	scanf("%s",path);
-	txt=fopen(path,"r");;
-
-	if(txt == NULL)
-	{
-		printf("\n\n****Cargar de Articulos mediante archivo TXT****\n\nNo se pudo abrir el archivo\n");
-	}
-	else if((result=parser_ArticulosComoTexto(txt ,pArrayList)))
-	{
-		printf("\n\n****Cargar de Articulos mediante archivo TXT****\n\nSe cargaron los Articulos\n");
-		fclose(txt);
-	}
-	else if(result==-1)
-	{
-		printf("\n\n****Cargar de Articulos mediante archivo TXT****\n\nNo hay mas espacio para almacenar toda la informacion del archivo\n");
-		fclose(txt);
-	}
-	else
-	{
-		printf("\n\n****Cargar de Articulos mediante archivo TXT****\n\nHubo un error al momento de la lectura del archivo\n");
-		fclose(txt);
-
-	}
-
-    return 1;
+		int tam;
+		int result;
+		char pregunta;
+		char path[512];
+		fflush(stdin);
+		printf("\nIngrese el nombre del archivo\n");
+		scanf("%s",path);
+		txt=fopen(path,"r");
+		tam=ll_len(pArrayList);
+		if(txt == NULL)
+		{
+			printf("\n\n****Cargar de Articulos mediante archivo TXT****\n\nNo se pudo abrir el archivo\n");
+		}
+		else
+		{
+			if(tam>0)
+			{
+				printf("\n\n****Cargar de Articulos mediante archivo TXT****\n\n");
+				fflush(stdin);
+				if((utn_getCaracter(&pregunta,"El sistema ya posee informacion,desea remplazarlos?(s/n):\n","Error verifique los datos ingresados, quedan %d reintentos\n","sn\n",3)))
+				{
+					if(pregunta=='s')
+					{
+						if((controller_memoryFree(pArrayList)))
+						{
+							if((result=parser_ArticulosComoTexto(txt,pArrayList)))
+							{
+								printf("\n\n****Remplazo de informacion mediante archivo TXT****\n\nSe cargaron los Articulos\n");
+							}
+							else if(result==-1)
+							{
+								printf("\n\n****Remplazo de informacion mediante archivo TXT****\n\nNo hay mas espacio para almacenar toda la informacion del archivo\n");
+							}
+							else
+							{
+								printf("\n\n****Remplazo de informacion mediante archivo TXT****\n\nHubo un error al momento de la lectura del archivo\n");
+							}
+						}
+						else
+						{
+							printf("\n\n****Remplazo de informacion mediante archivo TXT****\n\nHubo un error al momento de eliminar la informacion existente\n");
+						}
+					}
+					else
+					{
+						printf("\n\n****Se cancelo la cargar****\n\n");
+					}
+				}
+				else
+				{
+					printf("\n\n****Se cancelo la cargar****\n\nSupero el maximo de intentos\n");
+				}
+			}
+			else if((result=parser_ArticulosComoTexto(txt,pArrayList)))
+			{
+				printf("\n\n****Cargar de Articulos mediante archivo TXT****\n\nSe cargaron los Articulos\n");
+			}
+			else if(result==-1)
+			{
+				printf("\n\n****Cargar de Articulos mediante archivo TXT****\n\nNo hay mas espacio para almacenar toda la informacion del archivo\n");
+			}
+			else
+			{
+				printf("\n\n****Cargar de Articulos mediante archivo TXT****\n\nHubo un error al momento de la lectura del archivo\n");
+			}
+			fclose(txt);
+		}
+		system("PAUSE()");
+	    return 1;
 }
 
 
@@ -177,7 +214,7 @@ int controller_saveAsText(char* path , LinkedList* pArrayList)
 
 int controller_memoryFree(LinkedList* pArrayList)
 {
-	eArticulo* artiAux=NULL;
+	eArticulo* artAux=NULL;
 	int ret=0;
 	int i;
 	int tam;
@@ -190,9 +227,9 @@ int controller_memoryFree(LinkedList* pArrayList)
 		{
 			for(i=0;i<tam;i++)
 			{
-				{
-					artiAux=ll_get(pArrayList,i);
-					eArticulo_delete(artiAux);
+				if((artAux=ll_get(pArrayList,i))!=NULL){
+
+					eArticulo_delete(artAux);
 				}
 			}
 
